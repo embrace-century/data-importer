@@ -19,11 +19,31 @@ class NodeMonitor < BaseRecord
     end
 
     def handle_row(row)
-      load_monitor(row[0])
+      number = row[0].strip
+      load_monitor(number)
+      return unless @monitor
+
+      return if row[9].blank?
+
+      @info = @monitor.infos.find_or_create_by(recorded_at: row[9].strip)
+      @info.cod = row[1].to_f
+      @info.do = row[2].to_f
+      @info.tp = row[3].to_f
+      @info.nh3 = row[4].to_f
+      @info.ss = row[5].to_f
+      @info.ph = row[6].to_f
+      @info.v = row[7].to_f
+      @info.q = row[8].to_f
+
+      @info.save
+
+      puts @info
+
+      puts '--------------' + @info.id.to_s
     end
 
     def load_monitor(number)
-      puts number.strip
+      @monitor = find_by(number: number)
     end
   end
 end
